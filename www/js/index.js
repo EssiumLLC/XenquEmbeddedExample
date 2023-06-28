@@ -21,6 +21,14 @@ function onDeviceReady() {
             if(e.data.hasNavigation) menuButton.style.display = 'block';
             else menuButton.style.display = 'none';
         }
+        else if(e.data && e.data.action == 'xenqu_system_action' && e.data.state)
+        {
+            //This is the state of xenqu telling us that the instance viewer has been closed (this only happend when the item doesn't need to reload and is expected to return the user to the record view)
+            if(e.data.state == 'close_item_viewer')
+            {
+                frame.remove();
+            }
+        }
     });
     frame.onload = function() { 
         setupEmbedded(frame);        
@@ -41,5 +49,8 @@ function setupEmbedded(frame){
     frame.contentWindow.postMessage({action: 'xenqu_get_navigation_back_state'}, frame.src);
     //Same as above (in case of a reload or redirect to login)
     frame.contentWindow.postMessage({action: 'xenqu_get_navigation_menu_state'}, frame.src);
+
+    //This tells xenqu we are loading into an instance of an item, this url is fetched from the admin link with user credentials
+    frame.contentWindow.postMessage({action: 'xenqu_execute_action', load_item: true}, '*');
     
 }
